@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - pip install --upgrade pip
+
+  build:
+    commands:
+      - echo "Zipping lambda code..."
+      - zip lambda_code.zip lambda_function.py
+
+  post_build:
+    commands:
+      - echo "Uploading to S3 bucket"
+      - aws s3 cp lambda_code.zip s3://jp1980-terraform-bucket/lambda_code.zip
+      - echo "Updating Lambda function..."
+      - aws lambda update-function-code \
+          --function-name MyLambdaFunction \
+          --s3-bucket jp1980-terraform-bucket \
+          --s3-key lambda_code.zip
